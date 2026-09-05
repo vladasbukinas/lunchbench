@@ -15,8 +15,10 @@ import (
 const chatPath = "/v1/chat/completions"
 
 const systemPrompt = `You are a lunch concierge. You are given today's restaurant
-menu data and a task. Answer only from the provided data, be concise, and do not
-invent restaurants or prices.`
+menu data, including how far each restaurant is (walking minutes), and a task.
+Answer only from the provided data, be concise, and do not invent restaurants,
+prices, or distances. When asked to decide, weigh both the food and the
+walking distance.`
 
 type task struct {
 	name string
@@ -27,8 +29,9 @@ func tasks() []task {
 	return []task{
 		{name: "budget-list", ask: "List every lunch special priced under $12.00 with its restaurant name and exact price."},
 		{name: "cheapest", ask: "Which single lunch special across all restaurants is the cheapest, and what does it include?"},
-		{name: "vegetarian", ask: "Recommend the best vegetarian-friendly lunch under $11.00 in exactly three sentences."},
-		{name: "summary", ask: "Summarize each restaurant in one short line including its price range from cheapest to priciest special."},
+		{name: "vegetarian", ask: "Recommend the best vegetarian-friendly lunch under $11.00, weighing the food and the walking distance, in exactly three sentences."},
+		{name: "summary", ask: "Summarize each restaurant in one short line including its price range from cheapest to priciest special and its walking time."},
+		{name: "quick-pick", ask: "You have only 30 minutes for lunch today. Pick one restaurant and one special, and explain in two sentences how distance and price shaped your decision."},
 	}
 }
 
