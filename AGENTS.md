@@ -22,3 +22,4 @@ Single `main` package:
 - The kronk SDK (`github.com/ardanlabs/kronk/sdk/kronk/model`) is used only for `model.D` (an ordered map) and `model.ChatResponse` types — it's the sole dependency despite a large transitive tree in `go.mod`.
 - Thinking mode is toggled via the non-standard `chat_template_kwargs: {enable_thinking: ...}` field (Qwen3-style), not a standard OpenAI field.
 - Server metrics (`tokens_per_second`, `time_to_first_token_ms`) come from the final usage-only SSE chunk (a chunk with no choices); the report also computes local TPS as `completionTokens / (wall - ttft)`.
+- The inference backend (cpu/cuda/vulkan/...) is fixed per server process at startup (`KRONK_PROCESSOR`); clients cannot switch it per request. Lunchbench detects the active one via `GET /v1/kronk/libs` (`processor` field) and `-server` accepts a comma-separated list to benchmark several backends in one run.

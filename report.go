@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"runtime"
 	"sort"
+	"strings"
 	"time"
 )
 
@@ -83,7 +84,26 @@ func printRunLine(i int, r runResult) {
 		i+1, r.task, ms(r.wall), ms(r.ttft), localTPS(r), r.promptTokens, r.completionTokens, r.reasoningTokens)
 }
 
-func printReport(modelID string, results []runResult, s summary, total time.Duration) {
+type serverRun struct {
+	base      string
+	processor string
+	results   []runResult
+	sum       summary
+	total     time.Duration
+}
+
+func printComparison(runs []serverRun) {
+	fmt.Println()
+	fmt.Println("COMPARISON")
+	fmt.Println("  inference      server                                 avg tps   avg ttft   avg wall")
+	fmt.Println(strings.Repeat("-", 100))
+	for _, sr := range runs {
+		fmt.Printf("  %-14s %-38s %7.2f   %6.0fms   %6.0fms\n",
+			sr.processor, sr.base, sr.sum.avgTPS, ms(sr.sum.avgTTFT), ms(sr.sum.avgWall))
+	}
+}
+
+func printReport(modelID string, processor string, results []runResult, s summary, total time.Duration) {
 	tps := make([]float64, len(results))
 	for i := range results {
 		tps[i] = localTPS(results[i])
@@ -97,6 +117,7 @@ func printReport(modelID string, results []runResult, s summary, total time.Dura
 	fmt.Println()
 	fmt.Println("MODEL")
 	fmt.Printf("  model id    : %s\n", modelID)
+	fmt.Printf("  inference   : %s\n", processor)
 
 	fmt.Println()
 	fmt.Println("RESULTS")
